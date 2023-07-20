@@ -1,0 +1,3 @@
+[submodule "nrf_sdk"]
+	path = nrf_sdk
+	url = git@github.com:jacobw56/nrf_sdk.git
