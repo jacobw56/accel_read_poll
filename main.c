@@ -61,7 +61,14 @@
 #include "nrf_log_default_backends.h"
 #include "nrf_gpio.h"
 
+#define SENSOR_POLL_INTERVAL APP_TIMER_TICKS(10) /**< Timer interval for sensor polling */
+
 APP_TIMER_DEF(m_sensor_poll_timer);
+
+static void sensor_poll_timer_timeout_handler(void *p_context)
+{
+    // Poll sensor
+}
 
 /**@brief Function for the Timer initialization.
  *
@@ -82,10 +89,9 @@ static void timers_init(void)
  */
 static void timers_start(void)
 {
-    /* YOUR_JOB: Start your timers. below is an example of how to start a timer.
-       uint32_t err_code;
-       err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
-       APP_ERROR_CHECK(err_code); */
+    uint32_t err_code;
+    err_code = app_timer_start(m_sensor_poll_timer, SENSOR_POLL_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
 }
 
 /**@brief Function for the Power manager.
@@ -106,7 +112,13 @@ static void idle_state_handle(void)
 {
     if (NRF_LOG_PROCESS() == false)
     {
-        nrf_pwr_mgmt_run();
+        // NOTE: We could shutdown RAM regions here, etc.
+
+        // Wait for an event.
+        __WFE();
+        // Clear the internal event register.
+        __SEV();
+        __WFE();
     }
 }
 
@@ -114,12 +126,8 @@ static void idle_state_handle(void)
  */
 int main(void)
 {
-    ret_code_t err_code;
-
     log_init();
     timers_init();
-
-    // Start execution.
     timers_start();
 
     // Enter main loop.
