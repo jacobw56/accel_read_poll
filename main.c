@@ -1,51 +1,16 @@
 /**
- * Copyright (c) 2014 - 2020, Nordic Semiconductor ASA
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form, except as embedded into a Nordic
- *    Semiconductor ASA integrated circuit in a product or a software update for
- *    such product, must reproduce the above copyright notice, this list of
- *    conditions and the following disclaimer in the documentation and/or other
- *    materials provided with the distribution.
- *
- * 3. Neither the name of Nordic Semiconductor ASA nor the names of its
- *    contributors may be used to endorse or promote products derived from this
- *    software without specific prior written permission.
- *
- * 4. This software, with or without modification, must only be used with a
- *    Nordic Semiconductor ASA integrated circuit.
- *
- * 5. Any software provided in binary form under this license must not be reverse
- *    engineered, decompiled, modified and/or disassembled.
- *
- * THIS SOFTWARE IS PROVIDED BY NORDIC SEMICONDUCTOR ASA "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL NORDIC SEMICONDUCTOR ASA OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
-/**
  * @file    main.c
  * @author  Walter Jacob - Overkill Projects, LLC.
  * @date    2023
  *
  * @brief   Main apllication file.
  *
- * @details Application template for use with BLE DFU bootloader.
+ * @details This application polls a sensor (LSM6DS33). Very simple
+ *          implementation, but not very portable. Change SENSOR_POLL_INTERVAL
+ *          to modify the sample rate, keeping in mind that Nyquist tells us
+ *          that we are only capturing signals up to 1/2 the sample rate, and
+ *          that the sensor has a maximum sample rate of 6.664k for the accel
+ *          and 1.666k for the gyro.
  */
 
 #include <stdbool.h>
@@ -65,9 +30,15 @@
 
 APP_TIMER_DEF(m_sensor_poll_timer);
 
+static bool m_poll_sensor;
+
+/**@brief Sensor polling timer callback.
+ *
+ * @details Kicks off a sensor read.
+ */
 static void sensor_poll_timer_timeout_handler(void *p_context)
 {
-    // Poll sensor
+    m_poll_sensor = true;
 }
 
 /**@brief Function for the Timer initialization.
@@ -122,17 +93,30 @@ static void idle_state_handle(void)
     }
 }
 
+static void read_sensor(void)
+{
+    if (m_poll_sensor == true)
+    {
+        m_poll_sensor = false;
+        // Read sensor
+    }
+}
+
 /**@brief Function for application main entry.
  */
 int main(void)
 {
     log_init();
     timers_init();
+
+    m_poll_sensor = false;
+
     timers_start();
 
     // Enter main loop.
     for (;;)
     {
+        read_sensor();
         idle_state_handle();
     }
 }
