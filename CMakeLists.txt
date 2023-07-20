@@ -1,13 +1,5 @@
 cmake_minimum_required(VERSION 3.22.0)
 
-if(NOT DFU_FILENAME)
-    message(FATAL_ERROR "ERROR - DFU_FILENAME not set: I need a filename for the DFU ZIP file!")
-endif()
-
-if(NOT KEY_DIR)
-    message(FATAL_ERROR "ERROR - KEY_DIR not set: I need the key to sign the DFU ZIP file!")
-endif()
-
 if(NOT ARM_NONE_EABI_PATH)
     message(FATAL_ERROR "ERROR - ARM_NONE_EABI_PATH not set: I need the path to the toolchain!")
 endif()
