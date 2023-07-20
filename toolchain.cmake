@@ -23,10 +23,22 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(OBJDUMP ${TOOLCHAIN_PREFIX}objdump)
 
-set(OPTIMIZATION_FLAGS "-O2")
-#set(OPTIMIZATION_FLAGS "-Og -g3")
-#set(COMMON_FLAGS "-mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs")
+# Debug build?
+if(DEBUG)
+    set(OPTIMIZATION_FLAGS "-Og -g3")
+    message(STATUS "Debug build selected")
+else()
+    set(OPTIMIZATION_FLAGS "-O2")
+endif()
+
 set(COMMON_FLAGS "-mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb -mabi=aapcs")
+
+# Link-time optimization?
+if (LTO)
+    set(COMMON_FLAGS "${COMMON_FLAGS} -flto")
+    message(STATUS "Link-time optimization selected")
+endif()
+
 
 set(C_FLAGS "${OPTIMIZATION_FLAGS} ${COMMON_FLAGS}")
 set(C_FLAGS "${C_FLAGS} -Wall -Werror")
