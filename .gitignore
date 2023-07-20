@@ -1,0 +1,21 @@
+# Segger files
+*.emSession
+*.jlink
+
+# Builds
+Output/
+build/
+_build/
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+
+# DS_Store
+.DS_Store
+
+# Old local versions
+*.old
+
+# Local VSC properties
+.vscode
