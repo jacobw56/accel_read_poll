@@ -64,7 +64,11 @@ add_executable(accel_read_poll ${CMAKE_SOURCE_DIR}/main.c)
 set_target_properties(accel_read_poll PROPERTIES C_STANDARD 11)
 set_target_properties(accel_read_poll PROPERTIES LINK_DEPENDS ${CMAKE_SOURCE_DIR}/${LINKER_SCRIPT})
 
-target_sources(accel_read_poll PUBLIC ${SDK_NRFX_MDK_MODULE_DIR}/gcc_startup_nrf52840.S)
+target_sources(
+    accel_read_poll PUBLIC 
+    ${SDK_NRFX_MDK_MODULE_DIR}/gcc_startup_nrf52840.S
+    ${CMAKE_SOURCE_DIR}/src/sensor.c
+)
 
 target_link_libraries(
 	accel_read_poll
@@ -75,6 +79,7 @@ target_link_libraries(
 
 target_include_directories(
     accel_read_poll PUBLIC
+    ${CMAKE_SOURCE_DIR}/inc
     ${SDK_COMPONENTS_DIR}
     ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/ble_advertising
     ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/ble_db_discovery
