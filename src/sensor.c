@@ -16,15 +16,6 @@
 static nrfx_spim_t *p_spi;
 static bool m_poll_sensor;
 
-nrfx_err_t sensor_init(sensor_t *sensor, nrfx_spim_t *spi)
-{
-    ASSERT(sensor->state != NRFX_DRV_STATE_INITIALIZED);
-    p_spi = spi;
-    m_poll_sensor = false;
-    sensor->state = NRFX_DRV_STATE_INITIALIZED;
-    return NRFX_SUCCESS;
-}
-
 static nrfx_err_t read_reg(sensor_t *sensor, uint8_t *result, size_t result_size, uint8_t reg)
 {
     uint8_t rx_buff[12];
@@ -105,14 +96,31 @@ nrfx_err_t sensor_write_reg(sensor_t *sensor, uint8_t value, uint8_t reg)
     return nrfx_spim_xfer(p_spi, &xfer, 0);
 }
 
+nrfx_err_t sensor_init(sensor_t *sensor, nrfx_spim_t *spi)
+{
+    ASSERT(sensor->state != NRFX_DRV_STATE_INITIALIZED);
+    p_spi = spi;
+
+    // Verify WHO_AM_I
+    uint8_t whoami;
+    nrfx_err_t ret = sensor_read_reg(sensor, &whoami, LSM6DSO32_WHOAMI);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    if (whoami != LSM6DSO32_WHO_AM_I_VALUE)
+        return NRFX_ERROR_INTERNAL;
+
+    m_poll_sensor = false;
+    sensor->state = NRFX_DRV_STATE_INITIALIZED;
+    return NRFX_SUCCESS;
+}
+
 nrfx_err_t sensor_reboot(sensor_t *sensor)
 {
     uint8_t ctrl3;
     nrfx_err_t ret = sensor_read_reg(sensor, &ctrl3, (uint8_t)LSM6DSO32_CTRL3_C);
     if (ret != NRFX_SUCCESS)
-    {
         return ret;
-    }
 
     ctrl3 |= LSM6DSO32_CTRL3_C_BOOT_MSK;
     return sensor_write_reg(sensor, ctrl3, (uint8_t)LSM6DSO32_CTRL3_C);
