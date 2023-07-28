@@ -3,9 +3,9 @@
  * @author  Walter Jacob - Overkill Projects, LLC.
  * @date    2023
  *
- * @brief   Main apllication file.
+ * @brief   Main application file.
  *
- * @details This application polls a sensor (LSM6DS33). Very simple
+ * @details This application polls a sensor (LSM6DSO32). Very simple
  *          implementation, but not very portable. Change SENSOR_POLL_INTERVAL
  *          to modify the sample rate, keeping in mind that Nyquist tells us
  *          that we are only capturing signals up to 1/2 the sample rate, and
@@ -25,12 +25,16 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "nrf_gpio.h"
+#include "nrfx_spim.h"
+
+#include "sensor.h"
 
 #define SENSOR_POLL_INTERVAL APP_TIMER_TICKS(10) /**< Timer interval for sensor polling */
 
 APP_TIMER_DEF(m_sensor_poll_timer);
 
-static bool m_poll_sensor;
+static nrfx_spim_t m_spi = NRFX_SPIM_INSTANCE(3);
+static sensor_t m_sensor;
 
 /**@brief Sensor polling timer callback.
  *
@@ -38,7 +42,7 @@ static bool m_poll_sensor;
  */
 static void sensor_poll_timer_timeout_handler(void *p_context)
 {
-    m_poll_sensor = true;
+    sensor_poll();
 }
 
 /**@brief Function for the Timer initialization.
@@ -93,13 +97,48 @@ static void idle_state_handle(void)
     }
 }
 
-static void read_sensor(void)
+/**@brief Function to initialize the SPI peripheral for this application.
+ *
+ * @retval NRFX error codes.
+ */
+static nrfx_err_t spi_init(void)
 {
-    if (m_poll_sensor == true)
-    {
-        m_poll_sensor = false;
-        // Read sensor
-    }
+    nrfx_spim_config_t cfg = NRFX_SPIM_DEFAULT_CONFIG;
+    cfg.sck_pin = NRF_GPIO_PIN_MAP(1, 8);
+    cfg.mosi_pin = NRF_GPIO_PIN_MAP(0, 7);
+    cfg.miso_pin = NRF_GPIO_PIN_MAP(0, 26);
+    cfg.ss_pin = NRF_GPIO_PIN_MAP(0, 27);
+    cfg.frequency = NRF_SPIM_FREQ_4M; // might be too fast for breadboards...
+    cfg.use_hw_ss = true;
+
+    return nrfx_spim_init(&m_spi, &cfg, NULL, NULL);
+}
+
+/**@brief Function to configure the sensor for this application.
+ *
+ * @retval NRFX error codes.
+ */
+static nrfx_err_t sensor_config(void)
+{
+    nrfx_err_t ret;
+
+    ret = sensor_init(&m_sensor, &m_spi);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_block_data_update(&m_sensor);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_set_accel_fs(&m_sensor, (uint8_t)LSM6DSO32_ACCEL_RANGE_8_G);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_set_accel_odr(&m_sensor, (uint8_t)LSM6DSO32_RATE_104_HZ);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    return NRFX_SUCCESS;
 }
 
 /**@brief Function for application main entry.
@@ -108,15 +147,14 @@ int main(void)
 {
     log_init();
     timers_init();
-
-    m_poll_sensor = false;
-
+    APP_ERROR_CHECK(spi_init());
+    APP_ERROR_CHECK(sensor_config());
     timers_start();
 
     // Enter main loop.
     for (;;)
     {
-        read_sensor();
+        sensor_process(&m_sensor);
         idle_state_handle();
     }
 }
