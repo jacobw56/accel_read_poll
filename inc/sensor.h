@@ -15,6 +15,7 @@
 #include "nrfx_spim.h"
 #include "lsm6dso32.h"
 
+/** @brief Union holding the appropriate sensor data struct (accel or gyro). */
 typedef union
 {
     struct
@@ -31,6 +32,7 @@ typedef union
     };
 } sensor_data_t;
 
+/** @brief Subsensor struct containing info about the accel or gyro. */
 typedef struct
 {
     sensor_data_t data;
@@ -38,6 +40,24 @@ typedef struct
     uint8_t odr;
 } sensor_subsensor_t;
 
+/** @brief Configuration structure of the SPIM driver instance. */
+typedef struct
+{
+    uint8_t accel_fs;
+    uint8_t accel_odr;
+    uint8_t gyro_fs;
+    uint8_t gyro_odr;
+} sensor_config_t;
+
+#define SENSOR_DEFAULT_CONFIG                     \
+    {                                             \
+        .accel_fs = LSM6DSO32_ACCEL_RANGE_8_G,    \
+        .accel_odr = LSM6DSO32_RATE_208_HZ,       \
+        .gyro_fs = LSM6DSO32_GYRO_RANGE_1000_DPS, \
+        .gyro_odr = LSM6DSO32_RATE_208_HZ,        \
+    }
+
+/** @brief Structure of the SPIM driver instance. */
 typedef struct
 {
     nrfx_drv_state_t state;
@@ -58,7 +78,7 @@ typedef struct
  * @retval NRFX_ERROR_INVALID_ADDR  The provided buffers are not placed in the Data
  *                                  RAM region.
  */
-nrfx_err_t sensor_init(sensor_t *sensor, nrfx_spim_t *spi);
+nrfx_err_t sensor_init(sensor_t *sensor, sensor_config_t *config, nrfx_spim_t *spi);
 
 /**
  * @brief Function for reading a register from the sensor.

@@ -122,19 +122,13 @@ static nrfx_err_t sensor_config(void)
 {
     nrfx_err_t ret;
 
-    ret = sensor_init(&m_sensor, &m_spi);
+    sensor_config_t cfg = SENSOR_DEFAULT_CONFIG;
+
+    ret = sensor_init(&m_sensor, &cfg, &m_spi);
     if (ret != NRFX_SUCCESS)
         return ret;
 
     ret = sensor_block_data_update(&m_sensor);
-    if (ret != NRFX_SUCCESS)
-        return ret;
-
-    ret = sensor_set_accel_fs(&m_sensor, (uint8_t)LSM6DSO32_ACCEL_RANGE_8_G);
-    if (ret != NRFX_SUCCESS)
-        return ret;
-
-    ret = sensor_set_accel_odr(&m_sensor, (uint8_t)LSM6DSO32_RATE_104_HZ);
     if (ret != NRFX_SUCCESS)
         return ret;
 

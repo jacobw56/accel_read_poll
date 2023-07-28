@@ -96,25 +96,6 @@ nrfx_err_t sensor_write_reg(sensor_t *sensor, uint8_t value, uint8_t reg)
     return nrfx_spim_xfer(p_spi, &xfer, 0);
 }
 
-nrfx_err_t sensor_init(sensor_t *sensor, nrfx_spim_t *spi)
-{
-    ASSERT(sensor->state != NRFX_DRV_STATE_INITIALIZED);
-    p_spi = spi;
-
-    // Verify WHO_AM_I
-    uint8_t whoami;
-    nrfx_err_t ret = sensor_read_reg(sensor, &whoami, LSM6DSO32_WHOAMI);
-    if (ret != NRFX_SUCCESS)
-        return ret;
-
-    if (whoami != LSM6DSO32_WHO_AM_I_VALUE)
-        return NRFX_ERROR_INTERNAL;
-
-    m_poll_sensor = false;
-    sensor->state = NRFX_DRV_STATE_INITIALIZED;
-    return NRFX_SUCCESS;
-}
-
 nrfx_err_t sensor_reboot(sensor_t *sensor)
 {
     uint8_t ctrl3;
@@ -246,6 +227,42 @@ nrfx_err_t sensor_set_gyro_fs(sensor_t *sensor, uint8_t fs)
     }
 
     sensor->gyro.fs = fs;
+    return NRFX_SUCCESS;
+}
+
+nrfx_err_t sensor_init(sensor_t *sensor, sensor_config_t *config, nrfx_spim_t *spi)
+{
+    ASSERT(sensor->state != NRFX_DRV_STATE_INITIALIZED);
+    p_spi = spi;
+
+    // Verify WHO_AM_I
+    uint8_t whoami;
+    nrfx_err_t ret = sensor_read_reg(sensor, &whoami, LSM6DSO32_WHOAMI);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    if (whoami != LSM6DSO32_WHO_AM_I_VALUE)
+        return NRFX_ERROR_INTERNAL;
+
+    // Configure the sensor
+    ret = sensor_set_accel_fs(sensor, config->accel_fs);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_set_accel_odr(sensor, config->accel_odr);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_set_gyro_fs(sensor, config->gyro_fs);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    ret = sensor_set_gyro_odr(sensor, config->gyro_odr);
+    if (ret != NRFX_SUCCESS)
+        return ret;
+
+    m_poll_sensor = false;
+    sensor->state = NRFX_DRV_STATE_INITIALIZED;
     return NRFX_SUCCESS;
 }
 
