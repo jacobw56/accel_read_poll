@@ -25,7 +25,7 @@ static nrfx_err_t read_reg(sensor_t *sensor, uint8_t *result, size_t result_size
         .p_tx_buffer = &reg_addr,
         .tx_length = 1,
         .p_rx_buffer = rx_buff,
-        .rx_length = result_size,
+        .rx_length = result_size + 1,
     };
 
     nrfx_err_t ret = nrfx_spim_xfer(p_spi, &xfer, 0);
