@@ -25,6 +25,7 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 #include "nrf_gpio.h"
+#include "nrfx_clock.h"
 #include "nrfx_spim.h"
 
 #include "sensor.h"
@@ -41,40 +42,72 @@ APP_TIMER_DEF(m_sensor_poll_timer);
 static nrfx_spim_t m_spi = NRFX_SPIM_INSTANCE(3);
 static sensor_t m_sensor;
 
+/**@brief Clock event callback.
+ *
+ * @param[in] event     Clock event to handle
+ */
+void clock_event_handler(nrfx_clock_evt_type_t event)
+{
+    switch (event)
+    {
+    case NRFX_CLOCK_EVT_HFCLK_STARTED:
+        break;
+    case NRFX_CLOCK_EVT_LFCLK_STARTED:
+        /* Could use this to start app_timer */
+        break;
+    case NRFX_CLOCK_EVT_CTTO:
+        break;
+    case NRFX_CLOCK_EVT_CAL_DONE:
+        break;
+    default:
+        break;
+    }
+}
+
 /**@brief Sensor polling timer callback.
  *
  * @details Kicks off a sensor read.
  */
-static void sensor_poll_timer_timeout_handler(void *p_context)
+static void sensor_poll_timeout_handler(void *p_context)
 {
     sensor_poll();
 }
 
 /**@brief Function for the Timer initialization.
  *
- * @details Initializes the timer module. This creates and starts application timers.
+ * @details Initializes the timer module. This creates the application timers.
  */
 static void timers_init(void)
 {
+    ret_code_t ret;
+
+    // Init the low-freq clock source for app_timer
+    ret = nrfx_clock_init(clock_event_handler);
+    APP_ERROR_CHECK(ret);
+
+    if (nrfx_clock_lfclk_is_running() == false)
+    {
+        nrfx_clock_lfclk_start();
+    }
 
     // Initialize timer module.
-    uint32_t err_code = app_timer_init();
-    APP_ERROR_CHECK(err_code);
+    ret = app_timer_init();
+    APP_ERROR_CHECK(ret);
 
-    err_code = app_timer_create(&m_sensor_poll_timer, APP_TIMER_MODE_REPEATED, sensor_poll_timer_timeout_handler);
-    APP_ERROR_CHECK(err_code);
+    ret = app_timer_create(&m_sensor_poll_timer, APP_TIMER_MODE_REPEATED, sensor_poll_timeout_handler);
+    APP_ERROR_CHECK(ret);
 }
 
 /**@brief Function for starting timers.
  */
 static void timers_start(void)
 {
-    uint32_t err_code;
-    err_code = app_timer_start(m_sensor_poll_timer, SENSOR_POLL_INTERVAL, NULL);
-    APP_ERROR_CHECK(err_code);
+    ret_code_t ret;
+    ret = app_timer_start(m_sensor_poll_timer, SENSOR_POLL_INTERVAL, NULL);
+    APP_ERROR_CHECK(ret);
 }
 
-/**@brief Function for the Power manager.
+/**@brief Function to initialize the log subsystem.
  */
 static void log_init(void)
 {
@@ -113,7 +146,7 @@ static nrfx_err_t spi_init(void)
     cfg.mosi_pin = SPI_MOSI_PIN;
     cfg.miso_pin = SPI_MISO_PIN;
     cfg.ss_pin = SPI_CS_PIN;
-    cfg.frequency = NRF_SPIM_FREQ_4M; // might be too fast for breadboards...
+    cfg.frequency = NRF_SPIM_FREQ_1M; // might be too fast for breadboards...
     cfg.use_hw_ss = true;
 
     return nrfx_spim_init(&m_spi, &cfg, NULL, NULL);
@@ -145,9 +178,10 @@ static nrfx_err_t sensor_config(void)
 int main(void)
 {
     log_init();
-    timers_init();
     APP_ERROR_CHECK(spi_init());
     APP_ERROR_CHECK(sensor_config());
+
+    timers_init();
     timers_start();
 
     // Enter main loop.
