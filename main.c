@@ -29,6 +29,11 @@
 
 #include "sensor.h"
 
+#define SPI_CS_PIN NRF_GPIO_PIN_MAP(0, 27)
+#define SPI_SCK_PIN NRF_GPIO_PIN_MAP(1, 8)
+#define SPI_MOSI_PIN NRF_GPIO_PIN_MAP(0, 7)
+#define SPI_MISO_PIN NRF_GPIO_PIN_MAP(0, 26)
+
 #define SENSOR_POLL_INTERVAL APP_TIMER_TICKS(10) /**< Timer interval for sensor polling */
 
 APP_TIMER_DEF(m_sensor_poll_timer);
@@ -104,10 +109,10 @@ static void idle_state_handle(void)
 static nrfx_err_t spi_init(void)
 {
     nrfx_spim_config_t cfg = NRFX_SPIM_DEFAULT_CONFIG;
-    cfg.sck_pin = NRF_GPIO_PIN_MAP(1, 8);
-    cfg.mosi_pin = NRF_GPIO_PIN_MAP(0, 7);
-    cfg.miso_pin = NRF_GPIO_PIN_MAP(0, 26);
-    cfg.ss_pin = NRF_GPIO_PIN_MAP(0, 27);
+    cfg.sck_pin = SPI_SCK_PIN;
+    cfg.mosi_pin = SPI_MOSI_PIN;
+    cfg.miso_pin = SPI_MISO_PIN;
+    cfg.ss_pin = SPI_CS_PIN;
     cfg.frequency = NRF_SPIM_FREQ_4M; // might be too fast for breadboards...
     cfg.use_hw_ss = true;
 
