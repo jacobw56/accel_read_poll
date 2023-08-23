@@ -277,26 +277,45 @@ nrfx_err_t ble_sensor_data_update(ble_sensor_t *p_sensor, sensor_data_t const *p
 
     uint16_t len = (uint16_t)sizeof(sensor_data_t);
 
-    ble_gatts_hvx_params_t hvx_params;
-
-    memset(&hvx_params, 0, sizeof(hvx_params));
-
-    hvx_params.handle = p_sensor->data_handles.value_handle;
-    hvx_params.offset = 0;
-    hvx_params.p_len = &len;
-    hvx_params.p_data = (uint8_t *)p_data;
-
-    if (indication_enabled)
+    if (notification_enabled || indication_enabled)
     {
-        hvx_params.type = BLE_GATT_HVX_INDICATION;
-    }
-    else if (notification_enabled)
-    {
-        hvx_params.type = BLE_GATT_HVX_NOTIFICATION;
-    }
+        ble_gatts_hvx_params_t hvx_params;
 
-    return sd_ble_gatts_hvx(p_sensor->conn_handle,
-                            &hvx_params);
+        memset(&hvx_params, 0, sizeof(hvx_params));
+
+        hvx_params.handle = p_sensor->data_handles.value_handle;
+        hvx_params.offset = 0;
+        hvx_params.p_len = &len;
+        hvx_params.p_data = (uint8_t *)p_data;
+
+        if (indication_enabled)
+        {
+            hvx_params.type = BLE_GATT_HVX_INDICATION;
+        }
+        else if (notification_enabled)
+        {
+            hvx_params.type = BLE_GATT_HVX_NOTIFICATION;
+        }
+
+        return sd_ble_gatts_hvx(p_sensor->conn_handle,
+                                &hvx_params);
+    }
+    else
+    {
+        ble_gatts_value_t gatts_value;
+
+        // Initialize value struct.
+        memset(&gatts_value, 0, sizeof(gatts_value));
+
+        gatts_value.len = len;
+        gatts_value.offset = 0;
+        gatts_value.p_value = (uint8_t *)p_data;
+
+        // Update database.
+        return sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+                                      p_sensor->data_handles.value_handle,
+                                      &gatts_value);
+    }
 }
 
 nrfx_err_t ble_sensor_odr_update(ble_sensor_t *p_sensor,
