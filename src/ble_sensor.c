@@ -312,7 +312,7 @@ nrfx_err_t ble_sensor_data_update(ble_sensor_t *p_sensor, sensor_data_t const *p
         gatts_value.p_value = (uint8_t *)p_data;
 
         // Update database.
-        return sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+        return sd_ble_gatts_value_set(p_sensor->conn_handle,
                                       p_sensor->data_handles.value_handle,
                                       &gatts_value);
     }
@@ -334,7 +334,7 @@ nrfx_err_t ble_sensor_odr_update(ble_sensor_t *p_sensor,
     gatts_value.p_value = (uint8_t *)odr;
 
     // Update database.
-    return sd_ble_gatts_value_set(BLE_CONN_HANDLE_INVALID,
+    return sd_ble_gatts_value_set(p_sensor->conn_handle,
                                   p_sensor->odr_handles.value_handle,
                                   &gatts_value);
 }
