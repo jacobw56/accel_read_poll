@@ -7,6 +7,8 @@
  *
  * @details A simple (not very portable) API for making reads from a sensor.
  */
+#ifndef SENSOR_H__
+#define SENSOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -231,3 +233,5 @@ void sensor_poll(void);
  * @param[in] sensor Pointer to the sensor driver structure.
  */
 void sensor_process(sensor_t *sensor);
+
+#endif /* SENSOR_H__ */

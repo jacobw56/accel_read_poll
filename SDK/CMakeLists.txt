@@ -3,6 +3,41 @@ message(STATUS "Starting with the ${SDK_COMPONENT_BLE_LIBRARIES_DIR} directory")
 target_sources(
     accel_read_poll PUBLIC
 
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/ble_advertising/ble_advertising.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/ble_services/ble_dis/ble_dis.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/common/ble_advdata.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/common/ble_conn_params.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/common/ble_conn_state.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/common/ble_srv_common.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/nrf_ble_gatt/nrf_ble_gatt.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/nrf_ble_gq/nrf_ble_gq.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/nrf_ble_qwr/nrf_ble_qwr.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/nrf_ble_scan/nrf_ble_scan.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/auth_status_tracker.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/gatt_cache_manager.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/gatts_cache_manager.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/id_manager.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/nrf_ble_lesc.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/peer_database.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/peer_data_storage.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/peer_id.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/peer_manager.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/peer_manager_handler.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/pm_buffer.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/security_dispatcher.c
+    ${SDK_COMPONENT_BLE_LIBRARIES_DIR}/peer_manager/security_manager.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/atomic_fifo/nrf_atfifo.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/atomic_flags/nrf_atflags.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/atomic/nrf_atomic.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/balloc/nrf_balloc.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/bootloader/dfu/nrf_dfu.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/bootloader/dfu/nrf_dfu_svci.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/cli/nrf_cli.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/experimental_section_vars/nrf_section_iter.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/fds/fds.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/fstorage/nrf_fstorage.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/fstorage/nrf_fstorage_nvmc.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/fstorage/nrf_fstorage_sd.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/hardfault/hardfault_implementation.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/log/src/nrf_log_backend_flash.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/log/src/nrf_log_backend_rtt.c
@@ -11,15 +46,36 @@ target_sources(
     ${SDK_COMPONENT_LIBRARIES_DIR}/log/src/nrf_log_default_backends.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/log/src/nrf_log_frontend.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/log/src/nrf_log_str_formatter.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/memobj/nrf_memobj.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/pwr_mgmt/nrf_pwr_mgmt.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/queue/nrf_queue.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/ringbuf/nrf_ringbuf.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/sha256/sha256.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/sortlist/nrf_sortlist.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/spi_mngr/nrf_spi_mngr.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/stack_guard/nrf_stack_guard.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/strerror/nrf_strerror.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/timer/app_timer.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/twi_mngr/nrf_twi_mngr.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/twi_sensor/nrf_twi_sensor.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/uart/app_uart.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/uart/app_uart_fifo.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/uart/retarget.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/usbd/app_usbd.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/usbd/app_usbd_core.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/usbd/app_usbd_serial_num.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/usbd/app_usbd_string_desc.c
+    ${SDK_COMPONENT_LIBRARIES_DIR}/usbd/class/cdc/acm/app_usbd_cdc_acm.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/app_error.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/app_error_handler_gcc.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/app_error_weak.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/app_util_platform.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/nrf_assert.c
     ${SDK_COMPONENT_LIBRARIES_DIR}/util/sdk_mapped_flags.c
+    ${SDK_COMPONENT_SOFTDEVICE_DIR}/common/nrf_sdh_ant.c
+    ${SDK_COMPONENT_SOFTDEVICE_DIR}/common/nrf_sdh_ble.c
+    ${SDK_COMPONENT_SOFTDEVICE_DIR}/common/nrf_sdh.c
+    ${SDK_COMPONENT_SOFTDEVICE_DIR}/common/nrf_sdh_soc.c
     ${SDK_EXTERNAL_DIR}/fprintf/nrf_fprintf.c
     ${SDK_EXTERNAL_DIR}/fprintf/nrf_fprintf_format.c
     ${SDK_EXTERNAL_DIR}/segger_rtt/SEGGER_RTT.c

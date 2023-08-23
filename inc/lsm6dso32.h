@@ -7,6 +7,8 @@
  *
  * @details LSM6DSO32 register definitions.
  */
+#ifndef LSM6DSO32_H__
+#define LSM6DSO32_H__
 
 #define LSM6DSO32_I2CADDR_DEFAULT 0x6A ///< LSM6DSO32 default I2C address
 
@@ -279,3 +281,5 @@ typedef enum hpf_range
     LSM6DSO32_HPF_ODR_DIV_9 = 2,
     LSM6DSO32_HPF_ODR_DIV_400 = 3,
 } lsm6dso32_hp_filter_t;
+
+#endif /* LSM6DSO32_H__ */

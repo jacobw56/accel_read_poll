@@ -68,6 +68,7 @@ target_sources(
     accel_read_poll PUBLIC 
     ${SDK_NRFX_MDK_MODULE_DIR}/gcc_startup_nrf52840.S
     ${CMAKE_SOURCE_DIR}/src/sensor.c
+    ${CMAKE_SOURCE_DIR}/src/ble_sensor.c
 )
 
 target_link_libraries(
