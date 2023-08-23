@@ -33,7 +33,7 @@ static void ble_sensor_on_cccd_write(ble_sensor_t *p_sensor, ble_gatts_evt_write
             }
             else if (ble_srv_is_notification_enabled(p_evt_write->data))
             {
-                evt.evt_type = BLE_SENSOR_EVT_INDICATION_ENABLED;
+                evt.evt_type = BLE_SENSOR_EVT_NOTIFICATION_ENABLED;
             }
             else
             {
